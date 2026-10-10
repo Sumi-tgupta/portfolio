@@ -1,0 +1,440 @@
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    ::selection,
+    *::selection {
+      background: #71ebba;
+      color: #03130e;
+      text-shadow: none;
+    }
+
+    ::-moz-selection,
+    *::-moz-selection {
+      background: #71ebba;
+      color: #03130e;
+      text-shadow: none;
+    }
+
+    html {
+      min-height: 100%;
+      background: #000;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 32px 6%;
+      background: #000;
+      color: #fff;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      animation: page-load-fade-in 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes page-load-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    a:focus-visible {
+      outline: 2px solid #71ebba;
+      outline-offset: 6px;
+    }
+
+    /* Navigation */
+    .navbar {
+      max-width: 1400px;
+      margin: 0 auto 55px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .logo {
+      flex-shrink: 0;
+      color: #fff;
+      text-decoration: none;
+      font-size: clamp(25px, 2.2vw, 30px);
+      font-weight: 750;
+      letter-spacing: -1.1px;
+      line-height: 1.1;
+      cursor: pointer;
+    }
+
+    .logo-accent {
+      color: #8b7cff;
+    }
+
+    /* Social icon links */
+    .social-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      margin-left: auto;
+    }
+
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      color: #a5a5a5;
+      text-decoration: none;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .social-links svg {
+      display: block;
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    .social-links a:hover {
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* Vanta panel: original blue-violet fog stays unchanged */
+    .vanta-panel {
+      position: relative;
+      isolation: isolate;
+      width: 100%;
+      height: min(72vh, 720px);
+      min-height: 430px;
+      overflow: hidden;
+      border: 1px solid rgba(139, 124, 255, 0.48);
+      border-radius: 24px;
+      background: #050816;
+      box-shadow: 0 0 45px rgba(80, 65, 190, 0.08);
+    }
+
+    #vanta-background {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #vanta-background canvas {
+      position: absolute !important;
+      inset: 0;
+    }
+
+    /* Transparent Three.js scene layered over the existing nebula on the right */
+    .sakshi-3d-scene {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 45%;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 1;
+    }
+
+    .sakshi-3d-scene canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .vanta-panel::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.3),
+        rgba(0, 0, 0, 0.02)
+      );
+    }
+
+    /* Hero text */
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      width: 100%;
+      height: 100%;
+      padding: clamp(28px, 8vw, 110px);
+      pointer-events: none;
+    }
+
+    .hero-title {
+      color: #fff;
+      font-size: clamp(48px, 8vw, 100px);
+      font-weight: 600;
+      letter-spacing: -5px;
+      line-height: 1.08;
+    }
+
+    .sakshi-line {
+      position: relative;
+      display: inline-flex;
+      align-items: baseline;
+      white-space: nowrap;
+      letter-spacing: -1px;
+    }
+
+    /* Canvas-only dots overlay; the real text remains the sizing/accessibility placeholder. */
+    #sakshi-dots {
+      display: none;
+      position: absolute;
+      left: -70px;
+      top: 50%;
+      width: calc(100% + 140px);
+      height: calc(100% + 140px);
+      transform: translateY(-50%);
+      z-index: 1;
+      overflow: visible;
+      pointer-events: none;
+      filter:
+        drop-shadow(0 0 6px rgba(113, 235, 186, 0.7))
+        drop-shadow(0 0 18px rgba(22, 185, 131, 0.35));
+    }
+
+    .sakshi-line.dots-active #sakshi-dots {
+      display: block;
+      animation: sakshi-dots-glow 1.8s ease-in-out infinite alternate;
+    }
+
+    /* Hide the real word on the very first paint while the dot canvas initializes. */
+    .sakshi-line.dots-pending #sakshi-text,
+    .sakshi-line.dots-active #sakshi-text {
+      visibility: hidden;
+    }
+
+    .sakshi-line.dots-active .typing-cursor {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      z-index: 2;
+      margin-left: 0;
+      transform: translateY(-35%);
+    }
+
+    /* Moving green gradient + glow, revealed by the typewriter script */
+    .sakshi-text {
+      display: inline-block;
+      color: #71ebba;
+      background-image: linear-gradient(
+        110deg,
+        #71ebba 0%,
+        #16b983 22%,
+        #e4fff3 38%,
+        #065540 53%,
+        #16b983 68%,
+        #71ebba 84%,
+        #e4fff3 100%
+      );
+      background-size: 240% 100%;
+      background-position: 0% 50%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation:
+        sakshi-gradient 3.2s linear infinite,
+        sakshi-glow 1.8s ease-in-out infinite alternate;
+    }
+
+    .typing-cursor {
+      /* Hide the blinking typewriter caret; keep its element for script compatibility. */
+      display: none !important;
+      width: 3px;
+      height: 0.82em;
+      margin-left: 0.08em;
+      vertical-align: baseline;
+      background: #71ebba;
+      border-radius: 2px;
+      transform: translateY(0.04em);
+      box-shadow: 0 0 8px rgba(113, 235, 186, 0.85);
+      animation: cursor-blink 0.85s steps(2, start) infinite;
+    }
+
+    @keyframes sakshi-gradient {
+      from { background-position: 0% 50%; }
+      to { background-position: 240% 50%; }
+    }
+
+    @keyframes sakshi-glow {
+      from {
+        filter: drop-shadow(0 0 3px rgba(113, 235, 186, 0.45));
+      }
+      to {
+        filter:
+          drop-shadow(0 0 7px rgba(113, 235, 186, 0.9))
+          drop-shadow(0 0 20px rgba(22, 185, 131, 0.38));
+      }
+    }
+
+    @keyframes cursor-blink {
+      to { opacity: 0; }
+    }
+
+    @keyframes sakshi-dots-glow {
+      from {
+        filter:
+          drop-shadow(0 0 4px rgba(113, 235, 186, 0.48))
+          drop-shadow(0 0 13px rgba(22, 185, 131, 0.25));
+      }
+      to {
+        filter:
+          drop-shadow(0 0 7px rgba(113, 235, 186, 0.78))
+          drop-shadow(0 0 20px rgba(22, 185, 131, 0.4));
+      }
+    }
+
+    /* Forbidden page */
+    .forbidden-page {
+      max-width: 1400px;
+      min-height: 65vh;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .forbidden-content {
+      max-width: 650px;
+    }
+
+    .error-code {
+      display: block;
+      margin-bottom: 18px;
+      color: #8b7cff;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 5px;
+    }
+
+    .forbidden-title {
+      color: #fff;
+      font-size: clamp(42px, 7vw, 76px);
+      letter-spacing: -3px;
+    }
+
+    .forbidden-title span {
+      color: #8b7cff;
+    }
+
+    .forbidden-content p {
+      margin-top: 22px;
+      color: #9292a5;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .home-link {
+      display: inline-block;
+      margin-top: 32px;
+      padding: 13px 22px;
+      border: 1px solid rgba(139, 124, 255, 0.5);
+      border-radius: 8px;
+      color: #bdb5ff;
+      text-decoration: none;
+      font-size: 13px;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .home-link:hover {
+      background: rgba(139, 124, 255, 0.1);
+      border-color: #8b7cff;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 24px 5%;
+      }
+
+      .navbar {
+        margin-bottom: 32px;
+        gap: 16px;
+      }
+
+      .logo {
+        font-size: 25px;
+      }
+
+      .social-links {
+        gap: 16px;
+      }
+
+      .social-links a {
+        width: 25px;
+        height: 25px;
+      }
+
+      .social-links svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .vanta-panel {
+        min-height: 500px;
+        height: 70vh;
+        border-radius: 18px;
+      }
+
+      .sakshi-3d-scene {
+        left: 0;
+        opacity: 0.6;
+      }
+
+      .hero-title {
+        letter-spacing: -2.5px;
+      }
+
+      .forbidden-title {
+        letter-spacing: -2px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .navbar {
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .social-links {
+        margin-left: auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body,
+      .sakshi-text,
+      .typing-cursor,
+      #sakshi-dots,
+      .social-links a,
+      .home-link {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
