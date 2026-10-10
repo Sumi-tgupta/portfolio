@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Sumit Gupta — Developer and creator of sAkshi.">
+  <title>Sumit Gupta | Building sAkshi</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    ::selection,
+    *::selection {
+      background: #71ebba;
+      color: #03130e;
+      text-shadow: none;
+    }
+
+    ::-moz-selection,
+    *::-moz-selection {
+      background: #71ebba;
+      color: #03130e;
+      text-shadow: none;
+    }
+
+    html {
+      min-height: 100%;
+      background: #000;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 32px 6%;
+      background: #000;
+      color: #fff;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      animation: page-load-fade-in 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes page-load-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    a:focus-visible {
+      outline: 2px solid #71ebba;
+      outline-offset: 6px;
+    }
+
+    /* Navigation */
+    .navbar {
+      max-width: 1400px;
+      margin: 0 auto 55px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .logo {
+      flex-shrink: 0;
+      color: #fff;
+      text-decoration: none;
+      font-size: clamp(25px, 2.2vw, 30px);
+      font-weight: 750;
+      letter-spacing: -1.1px;
+      line-height: 1.1;
+      cursor: pointer;
+    }
+
+    .logo-accent {
+      color: #8b7cff;
+    }
+
+    /* Social icon links */
+    .social-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      margin-left: auto;
+    }
+
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      color: #a5a5a5;
+      text-decoration: none;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .social-links svg {
+      display: block;
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    .social-links a:hover {
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* Vanta panel: original blue-violet fog stays unchanged */
+    .vanta-panel {
+      position: relative;
+      isolation: isolate;
+      width: 100%;
+      height: min(72vh, 720px);
+      min-height: 430px;
+      overflow: hidden;
+      border: 1px solid rgba(139, 124, 255, 0.48);
+      border-radius: 24px;
+      background: #050816;
+      box-shadow: 0 0 45px rgba(80, 65, 190, 0.08);
+    }
+
+    #vanta-background {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #vanta-background canvas {
+      position: absolute !important;
+      inset: 0;
+    }
+
+    /* Transparent Three.js scene layered over the existing nebula on the right */
+    .sakshi-3d-scene {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 45%;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 1;
+    }
+
+    .sakshi-3d-scene canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .vanta-panel::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.3),
+        rgba(0, 0, 0, 0.02)
+      );
+    }
+
+    /* Hero text */
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      width: 100%;
+      height: 100%;
+      padding: clamp(28px, 8vw, 110px);
+      pointer-events: none;
+    }
+
+    .hero-title {
+      color: #fff;
+      font-size: clamp(48px, 8vw, 100px);
+      font-weight: 600;
+      letter-spacing: -5px;
+      line-height: 1.08;
+    }
+
+    .sakshi-line {
+      position: relative;
+      display: inline-flex;
+      align-items: baseline;
+      white-space: nowrap;
+      letter-spacing: -1px;
+    }
+
+    /* Canvas-only dots overlay; the real text remains the sizing/accessibility placeholder. */
+    #sakshi-dots {
+      display: none;
+      position: absolute;
+      left: -70px;
+      top: 50%;
+      width: calc(100% + 140px);
+      height: calc(100% + 140px);
+      transform: translateY(-50%);
+      z-index: 1;
+      overflow: visible;
+      pointer-events: none;
+      filter:
+        drop-shadow(0 0 6px rgba(113, 235, 186, 0.7))
+        drop-shadow(0 0 18px rgba(22, 185, 131, 0.35));
+    }
+
+    .sakshi-line.dots-active #sakshi-dots {
+      display: block;
+      animation: sakshi-dots-glow 1.8s ease-in-out infinite alternate;
+    }
+
+    /* Hide the real word on the very first paint while the dot canvas initializes. */
+    .sakshi-line.dots-pending #sakshi-text,
+    .sakshi-line.dots-active #sakshi-text {
+      visibility: hidden;
+    }
+
+    .sakshi-line.dots-active .typing-cursor {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      z-index: 2;
+      margin-left: 0;
+      transform: translateY(-35%);
+    }
+
+    /* Moving green gradient + glow, revealed by the typewriter script */
+    .sakshi-text {
+      display: inline-block;
+      color: #71ebba;
+      background-image: linear-gradient(
+        110deg,
+        #71ebba 0%,
+        #16b983 22%,
+        #e4fff3 38%,
+        #065540 53%,
+        #16b983 68%,
+        #71ebba 84%,
+        #e4fff3 100%
+      );
+      background-size: 240% 100%;
+      background-position: 0% 50%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation:
+        sakshi-gradient 3.2s linear infinite,
+        sakshi-glow 1.8s ease-in-out infinite alternate;
+    }
+
+    .typing-cursor {
+      /* Hide the blinking typewriter caret; keep its element for script compatibility. */
+      display: none !important;
+      width: 3px;
+      height: 0.82em;
+      margin-left: 0.08em;
+      vertical-align: baseline;
+      background: #71ebba;
+      border-radius: 2px;
+      transform: translateY(0.04em);
+      box-shadow: 0 0 8px rgba(113, 235, 186, 0.85);
+      animation: cursor-blink 0.85s steps(2, start) infinite;
+    }
+
+    @keyframes sakshi-gradient {
+      from { background-position: 0% 50%; }
+      to { background-position: 240% 50%; }
+    }
+
+    @keyframes sakshi-glow {
+      from {
+        filter: drop-shadow(0 0 3px rgba(113, 235, 186, 0.45));
+      }
+      to {
+        filter:
+          drop-shadow(0 0 7px rgba(113, 235, 186, 0.9))
+          drop-shadow(0 0 20px rgba(22, 185, 131, 0.38));
+      }
+    }
+
+    @keyframes cursor-blink {
+      to { opacity: 0; }
+    }
+
+    @keyframes sakshi-dots-glow {
+      from {
+        filter:
+          drop-shadow(0 0 4px rgba(113, 235, 186, 0.48))
+          drop-shadow(0 0 13px rgba(22, 185, 131, 0.25));
+      }
+      to {
+        filter:
+          drop-shadow(0 0 7px rgba(113, 235, 186, 0.78))
+          drop-shadow(0 0 20px rgba(22, 185, 131, 0.4));
+      }
+    }
+
+    /* Forbidden page */
+    .forbidden-page {
+      max-width: 1400px;
+      min-height: 65vh;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .forbidden-content {
+      max-width: 650px;
+    }
+
+    .error-code {
+      display: block;
+      margin-bottom: 18px;
+      color: #8b7cff;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 5px;
+    }
+
+    .forbidden-title {
+      color: #fff;
+      font-size: clamp(42px, 7vw, 76px);
+      letter-spacing: -3px;
+    }
+
+    .forbidden-title span {
+      color: #8b7cff;
+    }
+
+    .forbidden-content p {
+      margin-top: 22px;
+      color: #9292a5;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .home-link {
+      display: inline-block;
+      margin-top: 32px;
+      padding: 13px 22px;
+      border: 1px solid rgba(139, 124, 255, 0.5);
+      border-radius: 8px;
+      color: #bdb5ff;
+      text-decoration: none;
+      font-size: 13px;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .home-link:hover {
+      background: rgba(139, 124, 255, 0.1);
+      border-color: #8b7cff;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 24px 5%;
+      }
+
+      .navbar {
+        margin-bottom: 32px;
+        gap: 16px;
+      }
+
+      .logo {
+        font-size: 25px;
+      }
+
+      .social-links {
+        gap: 16px;
+      }
+
+      .social-links a {
+        width: 25px;
+        height: 25px;
+      }
+
+      .social-links svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .vanta-panel {
+        min-height: 500px;
+        height: 70vh;
+        border-radius: 18px;
+      }
+
+      .sakshi-3d-scene {
+        left: 0;
+        opacity: 0.6;
+      }
+
+      .hero-title {
+        letter-spacing: -2.5px;
+      }
+
+      .forbidden-title {
+        letter-spacing: -2px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .navbar {
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .social-links {
+        margin-left: auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body,
+      .sakshi-text,
+      .typing-cursor,
+      #sakshi-dots,
+      .social-links a,
+      .home-link {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="navbar">
+    <a
+      class="logo"
+      href="https://sumitgupta.me/"
+      aria-label="Sumit Gupta homepage"
+    >Sumit Gupta<span class="logo-accent"></span></a>
+
+    <nav class="social-links" aria-label="Social profiles">
+      <a
+        href="https://github.com/Sumi-tgupta"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="GitHub profile"
+        title="GitHub"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.08c-3.1.67-3.76-1.32-3.76-1.32-.51-1.3-1.24-1.65-1.24-1.65-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15 1 1.7 2.63 1.21 3.27.92.1-.71.39-1.21.71-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.21 1.15-2.99-.12-.28-.5-1.42.11-2.95 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.53.23 2.67.11 2.95.72.78 1.15 1.77 1.15 2.99 0 4.29-2.61 5.24-5.1 5.51.4.35.76 1.02.76 2.06v3.06c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z"/>
+        </svg>
+      </a>
+
+      <a
+        href="https://linkedin.com/in/sumi-tgupta"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="LinkedIn profile"
+        title="LinkedIn"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.44-2.13 2.94v5.67H9.36V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.26 2.37 4.26 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.23 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0h.01Z"/>
+        </svg>
+      </a>
+    </nav>
+  </header>
+
+  <main id="home-page">
+    <section class="vanta-panel" aria-label="Building sAkshi">
+      <div id="vanta-background" aria-hidden="true"></div>
+      <div id="sakshi-3d-scene" class="sakshi-3d-scene" aria-hidden="true"></div>
+
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Building<br>
+          <span class="sakshi-line dots-pending" aria-label="sAkshi">
+            <span id="sakshi-text" class="sakshi-text" aria-label="sAkshi">sAkshi</span>
+            <canvas id="sakshi-dots" aria-hidden="true"></canvas>
+            <span class="typing-cursor" aria-hidden="true"></span>
+          </span>
+        </h1>
+      </div>
+    </section>
+  </main>
+
+  <main id="forbidden-page" class="forbidden-page" hidden>
+    <section class="forbidden-content">
+      <span class="error-code">ERROR 403</span>
+      <h1 class="forbidden-title">Forbidden<span>.</span></h1>
+      <p>You cannot access this route.</p>
+      <a class="home-link" href="https://sumitgupta.me/">Return to homepage ↗</a>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js"></script>
+
+  <script>
+    let vantaEffect;
+
+    const path = window.location.pathname.replace(/\/+$/, "") || "/";
+    const isLocalFile = window.location.protocol === "file:";
+    const isHome = isLocalFile || path === "/" || path === "/index.html";
+
+    const homePage = document.getElementById("home-page");
+    const forbiddenPage = document.getElementById("forbidden-page");
+
+    if (isHome) {
+      homePage.hidden = false;
+      forbiddenPage.hidden = true;
+
+      /* Dot-matrix sAkshi text. If canvas sampling fails, use the original text typewriter. */
+      (() => {
+        const sakshiText = document.getElementById("sakshi-text");
+        const sakshiLine = document.querySelector(".sakshi-line");
+        const dotCanvas = document.getElementById("sakshi-dots");
+        const typingCursor = document.querySelector(".typing-cursor");
+        const fullText = "sAkshi";
+        const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+        /* Tweak variables */
+        const BASE_DOT_STEP_DESKTOP = 4;
+        const BASE_DOT_STEP_MOBILE = 5;
+        const DESKTOP_DOT_CAP = 2500;
+        const MOBILE_DOT_CAP = 1200;
+        const DOT_RADIUS_FACTOR = 0.42;
+        const CANVAS_PADDING = 70;
+        const REPEL_RADIUS_SCALE = 0.9;
+        const REPEL_RADIUS_MIN = 70;
+        const REPEL_RADIUS_MAX = 130;
+        const REPEL_STRENGTH = 0.6;
+        const SPRING_K = 0.08;
+        const DAMPING = 0.82;
+        const SPAWN_DELAY_MS = 450;
+        const LETTER_INTERVAL_MS = 170;
+        const SPAWN_DURATION_MS = 500;
+        const SHIMMER_SPEED = 0.22;
+        const COLOR_BUCKET_COUNT = 12;
+        const COLOR_STOPS = [
+          [22, 185, 131],
+          [113, 235, 186],
+          [228, 255, 243],
+          [113, 235, 186],
+          [22, 185, 131]
+        ];
+
+        let dotContext = null;
+        let maskCanvas = null;
+        let maskContext = null;
+        let active = false;
+        let disposed = false;
+        let reducedMotion = motionQuery.matches;
+        let heroIsVisible = !("IntersectionObserver" in window);
+        let tabIsVisible = document.visibilityState === "visible";
+        let animationFrameId = 0;
+        let resizeTimer = 0;
+        let resizeObserver = null;
+        let intersectionObserver = null;
+        let animationElapsedMs = 0;
+        let lastFrameTime = 0;
+        let lastPointerTime = 0;
+        let canvasCssWidth = 0;
+        let canvasCssHeight = 0;
+        let canvasDpr = 1;
+        let textWidth = 0;
+        let fontSizePx = 100;
+        let baseDotRadius = 1.7;
+        let repelRadius = 90;
+        let revealCount = 0;
+        let pointerActive = false;
+        let touchActive = false;
+        let pointerX = -10000;
+        let pointerY = -10000;
+        let letterBounds = [];
+        let letterRightOffsets = new Float32Array(0);
+        let letterSpawnTimes = new Float32Array(fullText.length);
+        let letterHasSpawned = new Uint8Array(fullText.length);
+        let homeX = new Float32Array(0);
+        let homeY = new Float32Array(0);
+        let dotX = new Float32Array(0);
+        let dotY = new Float32Array(0);
+        let dotVX = new Float32Array(0);
+        let dotVY = new Float32Array(0);
+        let dotLetterIndex = new Float32Array(0);
+        let dotBaseBucket = new Uint8Array(0);
+        let dotNearCursor = new Float32Array(0);
+        let bucketGroups = [];
+        let dotCount = 0;
+        let currentDotStep = BASE_DOT_STEP_DESKTOP;
+        let fallbackTimers = [];
+        let palette = [];
+        let onMotionChange;
+
+        function clamp(value, min, max) {
+          return Math.min(max, Math.max(min, value));
+        }
+
+        function smoothstep01(value) {
+          const t = clamp(value, 0, 1);
+          return t * t * (3 - 2 * t);
+        }
+
+        function rgbToCss(rgb) {
+          return `rgb(${Math.round(rgb[0])}, ${Math.round(rgb[1])}, ${Math.round(rgb[2])})`;
+        }
+
+        function makePalette() {
+          const colors = [];
+          for (let i = 0; i < COLOR_BUCKET_COUNT; i++) {
+            const position = i / (COLOR_BUCKET_COUNT - 1);
+            const segmentPosition = position * (COLOR_STOPS.length - 1);
+            const segment = Math.min(COLOR_STOPS.length - 2, Math.floor(segmentPosition));
+            const fraction = segmentPosition - segment;
+            const a = COLOR_STOPS[segment];
+            const b = COLOR_STOPS[segment + 1];
+            colors.push(rgbToCss([
+              a[0] + (b[0] - a[0]) * fraction,
+              a[1] + (b[1] - a[1]) * fraction,
+              a[2] + (b[2] - a[2]) * fraction
+            ]));
+          }
+          return colors;
+        }
+
+        function getRevealCount(elapsedMs) {
+          if (reducedMotion) return fullText.length;
+          if (elapsedMs < SPAWN_DELAY_MS) return 0;
+          return Math.min(
+            fullText.length,
+            Math.floor((elapsedMs - SPAWN_DELAY_MS) / LETTER_INTERVAL_MS) + 1
+          );
+        }
+
+        function clearFallbackTimers() {
+          fallbackTimers.forEach((timer) => window.clearTimeout(timer));
+          fallbackTimers = [];
+        }
+
+        function startFallbackTypewriter() {
+          active = false;
+          sakshiLine.classList.remove("dots-active", "dots-pending");
+          dotCanvas.style.display = "none";
+          clearFallbackTimers();
+          sakshiText.textContent = "";
+          typingCursor.style.left = "";
+          typingCursor.style.position = "";
+
+          if (motionQuery.matches) {
+            sakshiText.textContent = fullText;
+            return;
+          }
+
+          let index = 0;
+          const typeNextCharacter = () => {
+            if (disposed || active || motionQuery.matches) return;
+            if (index < fullText.length) {
+              sakshiText.textContent += fullText.charAt(index);
+              index += 1;
+              fallbackTimers.push(window.setTimeout(typeNextCharacter, LETTER_INTERVAL_MS));
+            }
+          };
+          fallbackTimers.push(window.setTimeout(typeNextCharacter, SPAWN_DELAY_MS));
+        }
+
+        function getCharacterBounds(spanRect, textNode) {
+          const result = [];
+          const range = document.createRange();
+          for (let i = 0; i < fullText.length; i++) {
+            range.setStart(textNode, i);
+            range.setEnd(textNode, i + 1);
+            const rect = range.getBoundingClientRect();
+            result.push({
+              left: rect.left - spanRect.left,
+              right: rect.right - spanRect.left,
+              center: (rect.left + rect.right) / 2 - spanRect.left
+            });
+          }
+          range.detach?.();
+          return result;
+        }
+
+        function drawMask(spanRect, style, textNode) {
+          const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+          const width = Math.max(1, Math.ceil(spanRect.width));
+          const height = Math.max(1, Math.ceil(spanRect.height));
+
+          maskCanvas.width = Math.max(1, Math.ceil(width * dpr));
+          maskCanvas.height = Math.max(1, Math.ceil(height * dpr));
+          maskContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+          maskContext.clearRect(0, 0, width, height);
+          maskContext.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+          maskContext.textBaseline = "alphabetic";
+          maskContext.fillStyle = "#ffffff";
+
+          const metrics = maskContext.measureText(fullText);
+          const ascent = metrics.actualBoundingBoxAscent || fontSizePx * 0.78;
+          const descent = metrics.actualBoundingBoxDescent || fontSizePx * 0.22;
+          const baseline = Math.max(
+            ascent,
+            (height - ascent - descent) / 2 + ascent
+          );
+
+          const supportsLetterSpacing = "letterSpacing" in maskContext;
+          if (supportsLetterSpacing) {
+            try {
+              maskContext.letterSpacing = style.letterSpacing;
+              maskContext.fillText(fullText, 0, baseline);
+            } catch (error) {
+              for (let i = 0; i < fullText.length; i++) {
+                maskContext.fillText(fullText.charAt(i), letterBounds[i].left, baseline);
+              }
+            }
+          } else {
+            /* Range-derived character starts preserve the browser's letter spacing. */
+            for (let i = 0; i < fullText.length; i++) {
+              maskContext.fillText(fullText.charAt(i), letterBounds[i].left, baseline);
+            }
+          }
+
+          return {
+            image: maskContext.getImageData(0, 0, maskCanvas.width, maskCanvas.height),
+            dpr,
+            width,
+            height
+          };
+        }
+
+        function collectDots(maskInfo, step, maxDots, paddingX, paddingY) {
+          const outputX = [];
+          const outputY = [];
+          const outputLetters = [];
+          const data = maskInfo.image.data;
+          const pixelWidth = maskCanvas.width;
+          const dpr = maskInfo.dpr;
+
+          for (let y = step * 0.5; y < maskInfo.height; y += step) {
+            const pixelY = clamp(Math.round(y * dpr), 0, maskCanvas.height - 1);
+            for (let x = step * 0.5; x < maskInfo.width; x += step) {
+              const pixelX = clamp(Math.round(x * dpr), 0, pixelWidth - 1);
+              const alphaIndex = (pixelY * pixelWidth + pixelX) * 4 + 3;
+              if (data[alphaIndex] < 70) continue;
+
+              let letterIndex = -1;
+              for (let i = 0; i < letterBounds.length; i++) {
+                if (x >= letterBounds[i].left - 1 && x <= letterBounds[i].right + 1) {
+                  letterIndex = i;
+                  break;
+                }
+              }
+              if (letterIndex < 0) {
+                let nearestDistance = Infinity;
+                for (let i = 0; i < letterBounds.length; i++) {
+                  const distance = Math.abs(x - letterBounds[i].center);
+                  if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    letterIndex = i;
+                  }
+                }
+              }
+
+              outputX.push(paddingX + x);
+              outputY.push(paddingY + y);
+              outputLetters.push(letterIndex);
+            }
+          }
+
+          return { x: outputX, y: outputY, letters: outputLetters };
+        }
+
+        function resetDotPhysics(finalStatic) {
+          letterHasSpawned.fill(0);
+          letterSpawnTimes.fill(0);
+          dotVX.fill(0);
+          dotVY.fill(0);
+          dotNearCursor.fill(0);
+          const count = finalStatic ? fullText.length : getRevealCount(animationElapsedMs);
+          revealCount = count;
+
+          for (let i = 0; i < dotCount; i++) {
+            const letter = dotLetterIndex[i];
+            dotX[i] = homeX[i];
+            dotY[i] = homeY[i];
+            if (finalStatic || letter < count) {
+              letterHasSpawned[letter] = 1;
+              letterSpawnTimes[letter] = finalStatic
+                ? 0
+                : Math.max(0, SPAWN_DELAY_MS + letter * LETTER_INTERVAL_MS);
+            }
+          }
+        }
+
+        function buildBucketGroups() {
+          bucketGroups = Array.from(
+            { length: fullText.length },
+            () => Array.from({ length: COLOR_BUCKET_COUNT }, () => [])
+          );
+          for (let i = 0; i < dotCount; i++) {
+            const letter = clamp(Math.floor(dotLetterIndex[i]), 0, fullText.length - 1);
+            bucketGroups[letter][dotBaseBucket[i]].push(i);
+          }
+        }
+
+        function setCanvasBackingSize() {
+          const canvasRect = dotCanvas.getBoundingClientRect();
+          canvasCssWidth = Math.max(1, canvasRect.width);
+          canvasCssHeight = Math.max(1, canvasRect.height);
+          canvasDpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+          dotCanvas.width = Math.max(1, Math.ceil(canvasCssWidth * canvasDpr));
+          dotCanvas.height = Math.max(1, Math.ceil(canvasCssHeight * canvasDpr));
+          dotContext.setTransform(canvasDpr, 0, 0, canvasDpr, 0, 0);
+          dotContext.clearRect(0, 0, canvasCssWidth, canvasCssHeight);
+        }
+
+        function rebuildDots(preserveProgress = true) {
+          if (!active || disposed) return;
+
+          const textNode = sakshiText.firstChild;
+          if (!textNode || textNode.nodeType !== Node.TEXT_NODE) {
+            throw new Error("sAkshi text placeholder is unavailable");
+          }
+
+          const style = getComputedStyle(sakshiText);
+          const spanRect = sakshiText.getBoundingClientRect();
+          if (spanRect.width <= 0 || spanRect.height <= 0) {
+            throw new Error("sAkshi text has no measurable size");
+          }
+
+          fontSizePx = parseFloat(style.fontSize) || 100;
+          textWidth = spanRect.width;
+          letterBounds = getCharacterBounds(spanRect, textNode);
+          letterRightOffsets = new Float32Array(fullText.length);
+          for (let i = 0; i < fullText.length; i++) {
+            letterRightOffsets[i] = letterBounds[i].right - spanRect.left + fontSizePx * 0.08;
+          }
+
+          setCanvasBackingSize();
+          const maskInfo = drawMask(spanRect, style, textNode);
+          const stepBase = window.innerWidth < 768
+            ? BASE_DOT_STEP_MOBILE
+            : BASE_DOT_STEP_DESKTOP;
+          let step = Math.max(1.5, stepBase * fontSizePx / 100);
+          const maxDots = window.innerWidth < 768 ? MOBILE_DOT_CAP : DESKTOP_DOT_CAP;
+          const paddingX = spanRect.left - dotCanvas.getBoundingClientRect().left;
+          const paddingY = spanRect.top - dotCanvas.getBoundingClientRect().top;
+          let sampled = collectDots(maskInfo, step, maxDots, paddingX, paddingY);
+          let attempts = 0;
+          while (sampled.x.length > maxDots && attempts < 8) {
+            step *= Math.sqrt(sampled.x.length / maxDots) * 1.04;
+            sampled = collectDots(maskInfo, step, maxDots, paddingX, paddingY);
+            attempts++;
+          }
+          if (!sampled.x.length) {
+            throw new Error("Could not sample any sAkshi glyph dots");
+          }
+
+          currentDotStep = step;
+          dotCount = sampled.x.length;
+          homeX = new Float32Array(dotCount);
+          homeY = new Float32Array(dotCount);
+          dotX = new Float32Array(dotCount);
+          dotY = new Float32Array(dotCount);
+          dotVX = new Float32Array(dotCount);
+          dotVY = new Float32Array(dotCount);
+          dotLetterIndex = new Float32Array(dotCount);
+          dotBaseBucket = new Uint8Array(dotCount);
+          dotNearCursor = new Float32Array(dotCount);
+          baseDotRadius = currentDotStep * DOT_RADIUS_FACTOR;
+          repelRadius = clamp(fontSizePx * REPEL_RADIUS_SCALE, REPEL_RADIUS_MIN, REPEL_RADIUS_MAX);
+
+          for (let i = 0; i < dotCount; i++) {
+            homeX[i] = sampled.x[i];
+            homeY[i] = sampled.y[i];
+            dotX[i] = sampled.x[i];
+            dotY[i] = sampled.y[i];
+            dotLetterIndex[i] = sampled.letters[i];
+            const relativeX = clamp((sampled.x[i] - paddingX) / Math.max(textWidth, 1), 0, 0.9999);
+            dotBaseBucket[i] = Math.floor(relativeX * COLOR_BUCKET_COUNT);
+          }
+
+          buildBucketGroups();
+          resetDotPhysics(reducedMotion || !preserveProgress);
+          if (!reducedMotion && preserveProgress) {
+            revealCount = getRevealCount(animationElapsedMs);
+          } else if (!reducedMotion && !preserveProgress) {
+            animationElapsedMs = 0;
+            revealCount = 0;
+            resetDotPhysics(false);
+          }
+          positionTypingCursor(revealCount);
+          drawDots(animationElapsedMs);
+        }
+
+        function positionTypingCursor(count) {
+          if (!active) return;
+          const left = count <= 0 ? 0 : letterRightOffsets[Math.min(count, fullText.length) - 1];
+          typingCursor.style.left = `${Math.max(0, left)}px`;
+        }
+
+        function spawnLetter(letterIndex, elapsedMs) {
+          letterHasSpawned[letterIndex] = 1;
+          letterSpawnTimes[letterIndex] = elapsedMs;
+          for (let i = 0; i < dotCount; i++) {
+            if (dotLetterIndex[i] !== letterIndex) continue;
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 40 + Math.random() * 80;
+            dotX[i] = homeX[i] + Math.cos(angle) * distance;
+            dotY[i] = homeY[i] + Math.sin(angle) * distance;
+            dotVX[i] = 0;
+            dotVY[i] = 0;
+          }
+        }
+
+        function updateDots(elapsedMs, deltaTime) {
+          const nextRevealCount = getRevealCount(elapsedMs);
+          if (nextRevealCount > revealCount) {
+            for (let letter = revealCount; letter < nextRevealCount; letter++) {
+              if (!letterHasSpawned[letter]) {
+                spawnLetter(letter, elapsedMs);
+              }
+            }
+          }
+          revealCount = nextRevealCount;
+          positionTypingCursor(revealCount);
+
+          const pointerEnabled = pointerActive && !reducedMotion;
+          for (let i = 0; i < dotCount; i++) {
+            const letter = Math.floor(dotLetterIndex[i]);
+            if (letter >= revealCount) {
+              dotNearCursor[i] = 0;
+              continue;
+            }
+
+            if (reducedMotion) {
+              dotX[i] = homeX[i];
+              dotY[i] = homeY[i];
+              dotVX[i] = 0;
+              dotVY[i] = 0;
+              dotNearCursor[i] = 0;
+              continue;
+            }
+
+            let targetX = homeX[i];
+            let targetY = homeY[i];
+            let proximity = 0;
+
+            if (pointerEnabled) {
+              const dx = dotX[i] - pointerX;
+              const dy = dotY[i] - pointerY;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              if (distance < repelRadius) {
+                proximity = 1 - distance / repelRadius;
+                const falloff = proximity * proximity;
+                const edgeLimit = Math.max(0, Math.min(
+                  repelRadius * REPEL_STRENGTH,
+                  homeX[i] - baseDotRadius,
+                  canvasCssWidth - homeX[i] - baseDotRadius,
+                  homeY[i] - baseDotRadius,
+                  canvasCssHeight - homeY[i] - baseDotRadius
+                ));
+                const pushDistance = edgeLimit * falloff;
+                const safeDistance = Math.max(distance, 0.001);
+                targetX += (dx / safeDistance) * pushDistance;
+                targetY += (dy / safeDistance) * pushDistance;
+              }
+            }
+
+            dotNearCursor[i] = proximity;
+            dotVX[i] = (dotVX[i] + (targetX - dotX[i]) * SPRING_K) * DAMPING;
+            dotVY[i] = (dotVY[i] + (targetY - dotY[i]) * SPRING_K) * DAMPING;
+            dotX[i] += dotVX[i];
+            dotY[i] += dotVY[i];
+          }
+        }
+
+        function getLetterOpacity(letterIndex, elapsedMs) {
+          if (reducedMotion) return 1;
+          const age = elapsedMs - letterSpawnTimes[letterIndex];
+          return smoothstep01(age / SPAWN_DURATION_MS);
+        }
+
+        function drawDots(elapsedMs) {
+          if (!dotContext || !dotCount) return;
+          dotContext.clearRect(0, 0, canvasCssWidth, canvasCssHeight);
+          const colorShift = reducedMotion
+            ? 0
+            : Math.floor((((elapsedMs / 1000) * SHIMMER_SPEED) % 1) * COLOR_BUCKET_COUNT);
+
+          for (let letter = 0; letter < revealCount; letter++) {
+            const alpha = getLetterOpacity(letter, elapsedMs);
+            if (alpha <= 0) continue;
+            dotContext.globalAlpha = alpha;
+
+            for (let baseBucket = 0; baseBucket < COLOR_BUCKET_COUNT; baseBucket++) {
+              const indices = bucketGroups[letter][baseBucket];
+              if (!indices.length) continue;
+              const actualBucket = (baseBucket + colorShift) % COLOR_BUCKET_COUNT;
+              dotContext.fillStyle = palette[actualBucket];
+              dotContext.beginPath();
+              for (let j = 0; j < indices.length; j++) {
+                const i = indices[j];
+                const radius = baseDotRadius * (1 + 0.3 * dotNearCursor[i]);
+                dotContext.moveTo(dotX[i] + radius, dotY[i]);
+                dotContext.arc(dotX[i], dotY[i], radius, 0, Math.PI * 2);
+              }
+              dotContext.fill();
+            }
+          }
+          dotContext.globalAlpha = 1;
+        }
+
+        function renderFrame(now) {
+          animationFrameId = 0;
+          if (disposed || !active || !heroIsVisible || !tabIsVisible || reducedMotion) return;
+
+          const deltaTime = lastFrameTime
+            ? Math.min(0.05, Math.max(0, (now - lastFrameTime) / 1000))
+            : 0;
+          lastFrameTime = now;
+          animationElapsedMs += deltaTime * 1000;
+          updateDots(animationElapsedMs, deltaTime);
+          drawDots(animationElapsedMs);
+          animationFrameId = window.requestAnimationFrame(renderFrame);
+        }
+
+        function syncLoop() {
+          if (disposed || !active) return;
+          const shouldRun = heroIsVisible && tabIsVisible && !reducedMotion;
+          if (shouldRun && animationFrameId === 0) {
+            lastFrameTime = 0;
+            animationFrameId = window.requestAnimationFrame(renderFrame);
+          } else if (!shouldRun && animationFrameId !== 0) {
+            window.cancelAnimationFrame(animationFrameId);
+            animationFrameId = 0;
+          }
+          if (reducedMotion) {
+            revealCount = fullText.length;
+            for (let letter = 0; letter < fullText.length; letter++) {
+              letterHasSpawned[letter] = 1;
+              letterSpawnTimes[letter] = 0;
+            }
+            for (let i = 0; i < dotCount; i++) {
+              dotX[i] = homeX[i];
+              dotY[i] = homeY[i];
+              dotVX[i] = 0;
+              dotVY[i] = 0;
+              dotNearCursor[i] = 0;
+            }
+            positionTypingCursor(fullText.length);
+            drawDots(0);
+          }
+        }
+
+        function handlePointerMove(event) {
+          if (disposed || !active) return;
+          const isMobile = window.innerWidth < 768;
+          if (isMobile) {
+            if (event.pointerType !== "touch" || !touchActive) {
+              pointerActive = false;
+              return;
+            }
+          } else if (event.pointerType === "touch") {
+            pointerActive = false;
+            return;
+          }
+
+          const panelRect = document.querySelector(".vanta-panel").getBoundingClientRect();
+          const insidePanel =
+            event.clientX >= panelRect.left && event.clientX <= panelRect.right &&
+            event.clientY >= panelRect.top && event.clientY <= panelRect.bottom;
+          if (!insidePanel) {
+            pointerActive = false;
+            return;
+          }
+
+          const canvasRect = dotCanvas.getBoundingClientRect();
+          pointerX = event.clientX - canvasRect.left;
+          pointerY = event.clientY - canvasRect.top;
+          pointerActive = true;
+          lastPointerTime = performance.now();
+        }
+
+        function handlePointerDown(event) {
+          if (window.innerWidth < 768 && event.pointerType === "touch") {
+            touchActive = true;
+            handlePointerMove(event);
+          }
+        }
+
+        function handlePointerUp(event) {
+          if (event.pointerType === "touch") {
+            touchActive = false;
+            pointerActive = false;
+          }
+        }
+
+        function handlePointerLeavePanel() {
+          pointerActive = false;
+          touchActive = false;
+        }
+
+        function handleVisibilityChange() {
+          tabIsVisible = document.visibilityState === "visible";
+          syncLoop();
+        }
+
+        function handleWindowResize() {
+          window.clearTimeout(resizeTimer);
+          resizeTimer = window.setTimeout(() => {
+            try {
+              rebuildDots(true);
+            } catch (error) {
+              fallbackFromDots();
+            }
+          }, 150);
+        }
+
+        function handleMotionPreferenceChange(event) {
+          reducedMotion = event.matches;
+          if (!active) {
+            startFallbackTypewriter();
+            return;
+          }
+          clearFallbackTimers();
+          if (reducedMotion) {
+            pointerActive = false;
+            touchActive = false;
+            revealCount = fullText.length;
+            resetDotPhysics(true);
+            drawDots(0);
+            syncLoop();
+          } else {
+            animationElapsedMs = 0;
+            revealCount = 0;
+            pointerActive = false;
+            touchActive = false;
+            resetDotPhysics(false);
+            syncLoop();
+          }
+        }
+
+        function fallbackFromDots() {
+          active = false;
+          sakshiLine.classList.remove("dots-active");
+          dotCanvas.style.display = "none";
+          clearFallbackTimers();
+          startFallbackTypewriter();
+        }
+
+        function cleanup() {
+          if (disposed) return;
+          disposed = true;
+          if (animationFrameId) {
+            window.cancelAnimationFrame(animationFrameId);
+            animationFrameId = 0;
+          }
+          window.clearTimeout(resizeTimer);
+          clearFallbackTimers();
+          window.removeEventListener("pointermove", handlePointerMove);
+          window.removeEventListener("pointerdown", handlePointerDown);
+          window.removeEventListener("pointerup", handlePointerUp);
+          window.removeEventListener("pointercancel", handlePointerUp);
+          document.removeEventListener("visibilitychange", handleVisibilityChange);
+          document.querySelector(".vanta-panel")?.removeEventListener("pointerleave", handlePointerLeavePanel);
+          window.removeEventListener("resize", handleWindowResize);
+          if (resizeObserver) resizeObserver.disconnect();
+          if (intersectionObserver) intersectionObserver.disconnect();
+          if (motionQuery.removeEventListener) {
+            motionQuery.removeEventListener("change", handleMotionPreferenceChange);
+          } else if (motionQuery.removeListener) {
+            motionQuery.removeListener(handleMotionPreferenceChange);
+          }
+          window.removeEventListener("pagehide", cleanup);
+          window.removeEventListener("beforeunload", cleanup);
+        }
+
+        function activateDots() {
+          if (disposed) return false;
+          dotContext = dotCanvas.getContext("2d", { alpha: true });
+          maskCanvas = document.createElement("canvas");
+          maskContext = maskCanvas.getContext("2d", { alpha: true, willReadFrequently: true });
+          if (!dotContext || !maskContext) return false;
+
+          sakshiLine.classList.add("dots-active");
+          dotCanvas.style.display = "block";
+          active = true;
+          palette = makePalette();
+
+          try {
+            rebuildDots(false);
+            active = true;
+            sakshiLine.classList.remove("dots-pending");
+            if (reducedMotion) {
+              animationElapsedMs = 0;
+              resetDotPhysics(true);
+              revealCount = fullText.length;
+              positionTypingCursor(revealCount);
+              drawDots(0);
+            } else {
+              animationElapsedMs = 0;
+              revealCount = 0;
+              resetDotPhysics(false);
+              positionTypingCursor(0);
+              syncLoop();
+            }
+            return true;
+          } catch (error) {
+            active = false;
+            sakshiLine.classList.remove("dots-active");
+            dotCanvas.style.display = "none";
+            return false;
+          }
+        }
+
+        function start() {
+          if (disposed) return;
+          const fontsReady = document.fonts && document.fonts.ready
+            ? document.fonts.ready
+            : Promise.resolve();
+          fontsReady.then(() => {
+            if (disposed) return;
+            if (!activateDots()) startFallbackTypewriter();
+          }).catch(() => startFallbackTypewriter());
+
+          window.addEventListener("pointermove", handlePointerMove, { passive: true });
+          window.addEventListener("pointerdown", handlePointerDown, { passive: true });
+          window.addEventListener("pointerup", handlePointerUp, { passive: true });
+          window.addEventListener("pointercancel", handlePointerUp, { passive: true });
+          window.addEventListener("resize", handleWindowResize, { passive: true });
+          document.addEventListener("visibilitychange", handleVisibilityChange);
+          document.querySelector(".vanta-panel").addEventListener("pointerleave", handlePointerLeavePanel, { passive: true });
+          if (motionQuery.addEventListener) {
+            motionQuery.addEventListener("change", handleMotionPreferenceChange);
+          } else if (motionQuery.addListener) {
+            motionQuery.addListener(handleMotionPreferenceChange);
+          }
+          if ("ResizeObserver" in window) {
+            resizeObserver = new ResizeObserver(() => handleWindowResize());
+            resizeObserver.observe(sakshiText);
+          }
+          if ("IntersectionObserver" in window) {
+            intersectionObserver = new IntersectionObserver((entries) => {
+              heroIsVisible = entries.some((entry) => entry.isIntersecting);
+              syncLoop();
+            }, { threshold: 0.05 });
+            intersectionObserver.observe(document.querySelector(".vanta-panel"));
+          }
+          window.addEventListener("pagehide", cleanup, { once: true });
+          window.addEventListener("beforeunload", cleanup, { once: true });
+        }
+
+        palette = makePalette();
+        onMotionChange = handleMotionPreferenceChange;
+        start();
+      })();
+
+      /* Original blue-violet Vanta background stays unchanged */
+      if (window.VANTA && window.THREE) {
+        vantaEffect = VANTA.FOG({
+          el: "#vanta-background",
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.0,
+          minWidth: 200.0,
+          highlightColor: 0x8b7cff,
+          midtoneColor: 0x3358a8,
+          lowlightColor: 0x151b35,
+          baseColor: 0x050816,
+          blurFactor: 0.6,
+          speed: 0.8,
+          zoom: 0.9
+        });
+      }
+    } else {
+      homePage.hidden = true;
+      forbiddenPage.hidden = false;
+      document.title = "403 Forbidden | Sumit Gupta";
+    }
+
+    window.addEventListener("beforeunload", () => {
+      if (vantaEffect) {
+        vantaEffect.destroy();
+      }
+    });
+  </script>
+
+  <!-- Three.js is loaded as a CDN ES module because this project is plain HTML. -->
+  <script type="module">
+    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+    const path = window.location.pathname.replace(/\/+$/, "") || "/";
+    const isLocalFile = window.location.protocol === "file:";
+    const isHome = isLocalFile || path === "/" || path === "/index.html";
+    const heroPanel = document.querySelector(".vanta-panel");
+    const sceneHost = document.getElementById("sakshi-3d-scene");
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    if (isHome && heroPanel && sceneHost) {
+      let renderer;
+      let scene;
+      let camera;
+      let rootGroup;
+      let crystal;
+      let crystalMaterial;
+      let innerGlow;
+      let innerGlowMaterial;
+      let coreLight;
+      let cursorLight;
+      let cursorGlowSprite;
+      let cursorGlowMaterial;
+      let shell;
+      let shellMaterial;
+      let shellGeometry;
+      let ringParticles = [];
+      let ringGroups = [];
+      let shellBasePositions = new Float32Array(0);
+      let repelX = new Float32Array(0);
+      let repelY = new Float32Array(0);
+      let repelZ = new Float32Array(0);
+      let particleCount = 0;
+      let isMobile = window.innerWidth < 768;
+      let reducedMotion = reducedMotionQuery.matches;
+      let heroIsVisible = true;
+      let tabIsVisible = document.visibilityState === "visible";
+      let animationFrameId = 0;
+      let elapsed = 0;
+      let lastFrameTime = 0;
+      let progress = 0;
+      let disposed = false;
+      let pointerInScene = false;
+      const pointerNdc = new THREE.Vector2(0, 0);
+      const pointerWorld = new THREE.Vector3(0, 0, 0);
+      const pointerLocal = new THREE.Vector3(0, 0, 0);
+      const pointerRaycaster = new THREE.Raycaster();
+      const scenePlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+      const DESKTOP_PARTICLE_COUNT = 3000;
+      const MOBILE_PARTICLE_COUNT = 1200;
+      const GLOW_COLOR = 0x6ee7b7;
+      const PURPLE_PARTICLE_COLOR = 0xb5a7ff;
+      const MAX_TILT_DEGREES = 15;
+      const maxTilt = THREE.MathUtils.degToRad(MAX_TILT_DEGREES);
+      const targetRotation = new THREE.Vector2(0, 0);
+      const glowColor = new THREE.Color(GLOW_COLOR);
+      const purpleColor = new THREE.Color(PURPLE_PARTICLE_COLOR);
+      const ringDefinitions = [
+        { radius: 1.45, tiltX: 0.75, tiltY: 0.24, speed: 0.30, color: GLOW_COLOR, opacity: 0.34 },
+        { radius: 1.74, tiltX: 1.05, tiltY: -0.62, speed: -0.22, color: 0xa69aff, opacity: 0.29 },
+        { radius: 2.03, tiltX: 0.38, tiltY: 0.82, speed: 0.16, color: 0x16b983, opacity: 0.23 }
+      ];
+
+      const smoothstep = (edge0, edge1, value) => {
+        const t = THREE.MathUtils.clamp((value - edge0) / (edge1 - edge0), 0, 1);
+        return t * t * (3 - 2 * t);
+      };
+
+      function initScene() {
+        try {
+          renderer = new THREE.WebGLRenderer({
+            alpha: true,
+            antialias: true,
+            powerPreference: "high-performance"
+          });
+        } catch (error) {
+          // Leave the existing hero and CSS nebula untouched if WebGL is unavailable.
+          return;
+        }
+
+        renderer.setPixelRatio(Math.min(2, Math.max(1, window.devicePixelRatio || 1)));
+        renderer.setClearColor(0x000000, 0);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.domElement.setAttribute("aria-hidden", "true");
+        sceneHost.appendChild(renderer.domElement);
+
+        scene = new THREE.Scene();
+        const bounds = sceneHost.getBoundingClientRect();
+        camera = new THREE.PerspectiveCamera(
+          45,
+          Math.max(bounds.width, 1) / Math.max(bounds.height, 1),
+          0.1,
+          60
+        );
+        camera.position.set(0, 0, 7.5);
+
+        scene.add(new THREE.AmbientLight(0x7c83a9, 0.35));
+        cursorLight = new THREE.PointLight(GLOW_COLOR, 0, 5.2, 2);
+        scene.add(cursorLight);
+
+        cursorGlowMaterial = new THREE.ShaderMaterial({
+          uniforms: {
+            uIntensity: { value: 0 },
+            uGlowColor: { value: new THREE.Color(GLOW_COLOR) }
+          },
+          vertexShader: `
+            varying vec2 vUv;
+            void main() {
+              vUv = uv;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `,
+          fragmentShader: `
+            uniform float uIntensity;
+            uniform vec3 uGlowColor;
+            varying vec2 vUv;
+            void main() {
+              float distanceFromCenter = length(vUv - 0.5) * 2.0;
+              float halo = exp(-distanceFromCenter * distanceFromCenter * 5.0);
+              float core = exp(-distanceFromCenter * distanceFromCenter * 24.0);
+              float alpha = (halo * 0.16 + core * 0.2) * uIntensity;
+              gl_FragColor = vec4(uGlowColor, alpha);
+              #include <tonemapping_fragment>
+              #include <colorspace_fragment>
+            }
+          `,
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending
+        });
+        cursorGlowSprite = new THREE.Mesh(new THREE.PlaneGeometry(1.35, 1.35), cursorGlowMaterial);
+        cursorGlowSprite.position.z = 1.5;
+        cursorGlowSprite.frustumCulled = false;
+        scene.add(cursorGlowSprite);
+
+        rootGroup = new THREE.Group();
+        rootGroup.position.set(0, isMobile ? -0.72 : 0, 0);
+        rootGroup.scale.setScalar(isMobile ? 0.72 : 0.98);
+        scene.add(rootGroup);
+
+        createCrystal();
+        createParticleShell();
+        createRings();
+        resizeScene();
+        addSceneListeners();
+        syncRenderLoop();
+      }
+
+      function createCrystal() {
+        const crystalGeometry = new THREE.IcosahedronGeometry(1.02, 1);
+        crystalMaterial = new THREE.ShaderMaterial({
+          uniforms: {
+            uTime: { value: 0 },
+            uGlow: { value: 0 },
+            uVisibility: { value: 0 },
+            uCursorLocal: { value: new THREE.Vector2(100, 100) },
+            uCursorStrength: { value: 0 },
+            uGlowColor: { value: new THREE.Color(GLOW_COLOR) },
+            uReducedMotion: { value: reducedMotion ? 1 : 0 }
+          },
+          vertexShader: `
+            varying vec3 vNormal;
+            varying vec3 vViewPosition;
+            varying vec3 vLocalPosition;
+            void main() {
+              vNormal = normalize(normalMatrix * normal);
+              vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+              vViewPosition = -mvPosition.xyz;
+              vLocalPosition = position;
+              gl_Position = projectionMatrix * mvPosition;
+            }
+          `,
+          fragmentShader: `
+            uniform float uTime;
+            uniform float uGlow;
+            uniform float uVisibility;
+            uniform vec2 uCursorLocal;
+            uniform float uCursorStrength;
+            uniform vec3 uGlowColor;
+            uniform float uReducedMotion;
+            varying vec3 vNormal;
+            varying vec3 vViewPosition;
+            varying vec3 vLocalPosition;
+
+            void main() {
+              vec3 normal = normalize(vNormal);
+              vec3 viewDirection = normalize(vViewPosition);
+              float fresnel = pow(1.0 - max(dot(normal, viewDirection), 0.0), 2.4);
+
+              float envGradient = smoothstep(-0.9, 0.85, normal.y + normal.x * 0.22);
+              vec3 envTop = vec3(0.035, 0.105, 0.095);
+              vec3 envBottom = vec3(0.006, 0.014, 0.026);
+              vec3 baseColor = mix(envBottom, envTop, envGradient);
+
+              float pulse = mix(1.0, 0.88 + 0.12 * sin(uTime * 1.25), 1.0 - uReducedMotion);
+              float cursorBloom = exp(-length(vLocalPosition.xy - uCursorLocal) * 1.65) * uCursorStrength;
+              float edgeStrength = fresnel * (0.22 + 0.8 * uGlow + cursorBloom * 1.7);
+              float innerWave = 0.5 + 0.5 * sin(vLocalPosition.x * 5.0 + vLocalPosition.y * 4.0 + uTime * 0.75);
+              vec3 greenEdge = uGlowColor * edgeStrength;
+              vec3 internalGlow = uGlowColor * 0.28 * uGlow * (0.22 + innerWave * 0.25) * pulse;
+              vec3 color = baseColor + greenEdge + internalGlow;
+
+              gl_FragColor = vec4(color, (0.84 + min(fresnel * 0.15, 0.15)) * uVisibility);
+              #include <tonemapping_fragment>
+              #include <colorspace_fragment>
+            }
+          `,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide
+        });
+
+        crystal = new THREE.Mesh(crystalGeometry, crystalMaterial);
+        crystal.rotation.set(0.12, -0.18, 0.04);
+        rootGroup.add(crystal);
+
+        const innerGeometry = new THREE.IcosahedronGeometry(0.62, 1);
+        innerGlowMaterial = new THREE.MeshBasicMaterial({
+          color: GLOW_COLOR,
+          transparent: true,
+          opacity: 0,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+        innerGlow = new THREE.Mesh(innerGeometry, innerGlowMaterial);
+        rootGroup.add(innerGlow);
+
+        coreLight = new THREE.PointLight(GLOW_COLOR, 0, 3.4, 2);
+        coreLight.position.set(0, 0, 0.15);
+        rootGroup.add(coreLight);
+      }
+
+      function buildShellGeometry(count) {
+        const positions = new Float32Array(count * 3);
+        const colors = new Float32Array(count * 3);
+
+        for (let i = 0; i < count; i++) {
+          const z = Math.random() * 2 - 1;
+          const angle = Math.random() * Math.PI * 2;
+          const planarRadius = Math.sqrt(1 - z * z);
+          const radius = 1.52 + Math.random() * 0.57;
+          const index = i * 3;
+
+          positions[index] = planarRadius * Math.cos(angle) * radius;
+          positions[index + 1] = planarRadius * Math.sin(angle) * radius;
+          positions[index + 2] = z * radius;
+
+          const color = Math.random() < 0.7 ? glowColor : purpleColor;
+          colors[index] = color.r;
+          colors[index + 1] = color.g;
+          colors[index + 2] = color.b;
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+        geometry.attributes.position.setUsage(THREE.DynamicDrawUsage);
+        shellBasePositions = new Float32Array(positions);
+        repelX = new Float32Array(count);
+        repelY = new Float32Array(count);
+        repelZ = new Float32Array(count);
+        return geometry;
+      }
+
+      function createParticleShell() {
+        particleCount = isMobile ? MOBILE_PARTICLE_COUNT : DESKTOP_PARTICLE_COUNT;
+        shellGeometry = buildShellGeometry(particleCount);
+        shellMaterial = new THREE.PointsMaterial({
+          size: isMobile ? 0.023 : 0.019,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          sizeAttenuation: true
+        });
+        shell = new THREE.Points(shellGeometry, shellMaterial);
+        rootGroup.add(shell);
+      }
+
+      function rebuildParticleShell() {
+        if (!shell || !shellMaterial) return;
+        const nextCount = isMobile ? MOBILE_PARTICLE_COUNT : DESKTOP_PARTICLE_COUNT;
+        if (nextCount === particleCount) return;
+
+        const newGeometry = buildShellGeometry(nextCount);
+        shell.geometry.dispose();
+        shell.geometry = newGeometry;
+        shellGeometry = newGeometry;
+        particleCount = nextCount;
+        shellMaterial.size = isMobile ? 0.023 : 0.019;
+      }
+
+      function createRings() {
+        const ringGeometry = new THREE.TorusGeometry(1, 0.0045, 6, 180);
+        const orbitDotGeometry = new THREE.SphereGeometry(0.032, 8, 8);
+
+        ringDefinitions.forEach((definition, ringIndex) => {
+          const ringGroup = new THREE.Group();
+          ringGroup.rotation.set(definition.tiltX, definition.tiltY, 0);
+          ringGroup.userData.speed = definition.speed;
+          ringGroup.userData.radius = definition.radius;
+          ringGroup.userData.baseOpacity = definition.opacity;
+
+          const ringMaterial = new THREE.MeshBasicMaterial({
+            color: definition.color,
+            transparent: true,
+            opacity: 0,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+          });
+          const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
+          ringMesh.scale.setScalar(definition.radius);
+          ringGroup.add(ringMesh);
+
+          const dotMaterial = new THREE.MeshBasicMaterial({
+            color: definition.color,
+            transparent: true,
+            opacity: 0,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+          });
+
+          for (let dotIndex = 0; dotIndex < 2; dotIndex++) {
+            const dot = new THREE.Mesh(orbitDotGeometry, dotMaterial);
+            const phase = dotIndex * Math.PI + ringIndex * 0.7;
+            dot.userData.phase = phase;
+            dot.userData.radius = definition.radius;
+            dot.userData.speed = definition.speed * (dotIndex === 0 ? 1 : -0.82);
+            dot.position.set(
+              Math.cos(phase) * definition.radius,
+              Math.sin(phase) * definition.radius,
+              0
+            );
+            ringGroup.add(dot);
+            ringParticles.push({ mesh: dot, material: dotMaterial });
+          }
+
+          ringGroups.push(ringGroup);
+          rootGroup.add(ringGroup);
+        });
+      }
+
+      function resizeScene() {
+        if (!renderer || !camera || disposed) return;
+        const bounds = sceneHost.getBoundingClientRect();
+        const width = Math.max(1, bounds.width);
+        const height = Math.max(1, bounds.height);
+
+        renderer.setPixelRatio(Math.min(2, Math.max(1, window.devicePixelRatio || 1)));
+        renderer.setSize(width, height, false);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+
+        const nextMobile = window.innerWidth < 768;
+        if (nextMobile !== isMobile) {
+          isMobile = nextMobile;
+          rebuildParticleShell();
+        }
+
+        rootGroup.scale.setScalar(isMobile ? 0.72 : 0.98);
+        rootGroup.position.y = isMobile ? -0.72 : 0;
+      }
+
+      function handlePointerMove(event) {
+        const panelBounds = heroPanel.getBoundingClientRect();
+        const panelX = (event.clientX - panelBounds.left) / Math.max(panelBounds.width, 1);
+        const panelY = (event.clientY - panelBounds.top) / Math.max(panelBounds.height, 1);
+        targetRotation.x = reducedMotion ? 0 : THREE.MathUtils.clamp((panelY - 0.5) * 2, -1, 1) * maxTilt;
+        targetRotation.y = reducedMotion ? 0 : THREE.MathUtils.clamp((panelX - 0.5) * 2, -1, 1) * maxTilt;
+
+        const sceneBounds = sceneHost.getBoundingClientRect();
+        pointerInScene =
+          event.clientX >= sceneBounds.left && event.clientX <= sceneBounds.right &&
+          event.clientY >= sceneBounds.top && event.clientY <= sceneBounds.bottom;
+
+        if (pointerInScene) {
+          pointerNdc.x = ((event.clientX - sceneBounds.left) / Math.max(sceneBounds.width, 1)) * 2 - 1;
+          pointerNdc.y = -((event.clientY - sceneBounds.top) / Math.max(sceneBounds.height, 1)) * 2 + 1;
+          pointerRaycaster.setFromCamera(pointerNdc, camera);
+          pointerRaycaster.ray.intersectPlane(scenePlane, pointerWorld);
+        }
+      }
+
+      function handlePointerLeave() {
+        pointerInScene = false;
+        targetRotation.set(0, 0);
+      }
+
+      function handleVisibilityChange() {
+        tabIsVisible = document.visibilityState === "visible";
+        syncRenderLoop();
+      }
+
+      function handleMotionPreferenceChange(event) {
+        reducedMotion = event.matches;
+        if (crystalMaterial) {
+          crystalMaterial.uniforms.uReducedMotion.value = reducedMotion ? 1 : 0;
+        }
+        targetRotation.set(0, 0);
+      }
+
+      function addSceneListeners() {
+        window.addEventListener("resize", resizeScene, { passive: true });
+        heroPanel.addEventListener("pointermove", handlePointerMove, { passive: true });
+        heroPanel.addEventListener("pointerleave", handlePointerLeave, { passive: true });
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        if (reducedMotionQuery.addEventListener) {
+          reducedMotionQuery.addEventListener("change", handleMotionPreferenceChange);
+        } else if (reducedMotionQuery.addListener) {
+          reducedMotionQuery.addListener(handleMotionPreferenceChange);
+        }
+
+        if ("IntersectionObserver" in window) {
+          observer = new IntersectionObserver((entries) => {
+            heroIsVisible = entries.some((entry) => entry.isIntersecting);
+            syncRenderLoop();
+          }, { threshold: 0.05 });
+          observer.observe(heroPanel);
+        }
+      }
+
+      let observer = null;
+
+      function syncRenderLoop() {
+        if (disposed || !renderer) return;
+        const shouldRun = heroIsVisible && tabIsVisible;
+        if (shouldRun && animationFrameId === 0) {
+          lastFrameTime = performance.now();
+          animationFrameId = requestAnimationFrame(renderFrame);
+        } else if (!shouldRun && animationFrameId !== 0) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = 0;
+        }
+      }
+
+      function updateShell(progressValue, deltaTime) {
+        const contraction = smoothstep(0.33, 0.83, progressValue);
+        const spread = reducedMotion ? 1 : THREE.MathUtils.lerp(1.72, 1.0, contraction);
+        const positions = shellGeometry.attributes.position.array;
+        const cursorShellLocal = pointerLocal.clone().applyQuaternion(shell.quaternion.clone().invert());
+        const repulsionEnabled = pointerInScene && !reducedMotion;
+        const radiusOfInfluence = 0.86;
+        const repulsionStrength = 0.15;
+        const easing = Math.min(1, deltaTime * 8.0);
+
+        for (let i = 0; i < particleCount; i++) {
+          const index = i * 3;
+          const bx = shellBasePositions[index] * spread;
+          const by = shellBasePositions[index + 1] * spread;
+          const bz = shellBasePositions[index + 2] * spread;
+          const dx = bx - cursorShellLocal.x;
+          const dy = by - cursorShellLocal.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          let targetX = 0;
+          let targetY = 0;
+          let targetZ = 0;
+
+          if (repulsionEnabled && distance < radiusOfInfluence) {
+            const ratio = 1 - distance / radiusOfInfluence;
+            const force = ratio * ratio * repulsionStrength;
+            const safeDistance = Math.max(distance, 0.001);
+            targetX = (dx / safeDistance) * force;
+            targetY = (dy / safeDistance) * force;
+            targetZ = (shellBasePositions[index + 2] / Math.max(Math.abs(shellBasePositions[index + 2]), 0.35)) * force * 0.25;
+          }
+
+          repelX[i] += (targetX - repelX[i]) * easing;
+          repelY[i] += (targetY - repelY[i]) * easing;
+          repelZ[i] += (targetZ - repelZ[i]) * easing;
+
+          positions[index] = bx + repelX[i];
+          positions[index + 1] = by + repelY[i];
+          positions[index + 2] = bz + repelZ[i];
+        }
+
+        shellGeometry.attributes.position.needsUpdate = true;
+        shellMaterial.opacity = reducedMotion ? progressValue : smoothstep(0.33, 0.83, progressValue);
+      }
+
+      function renderFrame(now) {
+        animationFrameId = 0;
+        if (disposed || !renderer || !heroIsVisible || !tabIsVisible) return;
+
+        const deltaTime = Math.min(0.05, Math.max(0, (now - lastFrameTime) / 1000));
+        lastFrameTime = now;
+        elapsed += deltaTime;
+        progress = THREE.MathUtils.clamp(elapsed / (reducedMotion ? 0.8 : 3.0), 0, 1);
+
+        const glowRamp = reducedMotion ? progress : smoothstep(0.17, 0.5, progress);
+        let flicker = 1;
+        if (!reducedMotion) {
+          const flickerDistance = Math.abs(progress - 0.4);
+          const flickerShape = THREE.MathUtils.clamp(1 - flickerDistance / 0.02, 0, 1);
+          flicker = 1 - 0.6 * flickerShape;
+        }
+
+        const pulse = reducedMotion ? 1 : 0.91 + 0.09 * Math.sin(elapsed * 1.25);
+        const crystalGlow = glowRamp * flicker * pulse;
+        crystalMaterial.uniforms.uTime.value = elapsed;
+        crystalMaterial.uniforms.uGlow.value = crystalGlow;
+        crystalMaterial.uniforms.uVisibility.value = reducedMotion
+          ? progress
+          : smoothstep(0.08, 0.3, progress);
+        innerGlowMaterial.opacity = glowRamp * flicker * (reducedMotion ? 0.13 : 0.24);
+        const innerPulse = reducedMotion ? 1 : 0.96 + 0.05 * Math.sin(elapsed * 1.1);
+        innerGlow.scale.setScalar(innerPulse);
+        coreLight.intensity = glowRamp * flicker * (isMobile ? 0.75 : 1.2);
+
+        if (!reducedMotion) {
+          const ramp = smoothstep(0.5, 1.0, progress);
+          rootGroup.rotation.x += (targetRotation.x - rootGroup.rotation.x) * 0.05;
+          rootGroup.rotation.y += (targetRotation.y - rootGroup.rotation.y) * 0.05;
+          crystal.rotation.y += deltaTime * 0.11 * (isMobile ? 0.55 : 1);
+          crystal.rotation.x += deltaTime * 0.035 * (isMobile ? 0.55 : 1);
+          shell.rotation.y += deltaTime * (isMobile ? 0.025 : 0.045);
+
+          ringGroups.forEach((ringGroup) => {
+            ringGroup.rotation.z += deltaTime * ringGroup.userData.speed * ramp * (isMobile ? 0.55 : 1);
+            ringGroup.children[0].material.opacity = ringGroup.userData.baseOpacity * smoothstep(0.5, 1.0, progress);
+          });
+
+          ringParticles.forEach(({ mesh, material }) => {
+            const angle = mesh.userData.phase + elapsed * mesh.userData.speed * ramp;
+            mesh.position.set(
+              Math.cos(angle) * mesh.userData.radius,
+              Math.sin(angle) * mesh.userData.radius,
+              0
+            );
+            material.opacity = 0.9 * ramp;
+          });
+        } else {
+          rootGroup.rotation.x += (0 - rootGroup.rotation.x) * 0.05;
+          rootGroup.rotation.y += (0 - rootGroup.rotation.y) * 0.05;
+          ringGroups.forEach((ringGroup) => {
+            ringGroup.children[0].material.opacity = ringGroup.userData.baseOpacity * progress;
+          });
+          ringParticles.forEach(({ material }) => {
+            material.opacity = 0.65 * progress;
+          });
+        }
+
+        updateShell(progress, deltaTime);
+
+        rootGroup.updateMatrixWorld(true);
+        if (pointerInScene) {
+          pointerLocal.copy(pointerWorld);
+          rootGroup.worldToLocal(pointerLocal);
+          const crystalLocalCursor = pointerLocal.clone().applyQuaternion(crystal.quaternion.clone().invert());
+          crystalMaterial.uniforms.uCursorLocal.value.set(crystalLocalCursor.x, crystalLocalCursor.y);
+          crystalMaterial.uniforms.uCursorStrength.value = isMobile ? 0.45 : 0.9;
+          cursorLight.position.copy(pointerWorld);
+          cursorLight.position.z = 1.2;
+          cursorLight.intensity = isMobile || reducedMotion ? 0 : 1.05;
+          cursorGlowSprite.position.set(pointerWorld.x, pointerWorld.y, 1.45);
+          cursorGlowMaterial.uniforms.uIntensity.value = isMobile || reducedMotion ? 0 : 1;
+        } else {
+          crystalMaterial.uniforms.uCursorLocal.value.set(100, 100);
+          crystalMaterial.uniforms.uCursorStrength.value = 0;
+          cursorLight.intensity = 0;
+          cursorGlowMaterial.uniforms.uIntensity.value = 0;
+          pointerLocal.set(100, 100, 100);
+        }
+
+        if (reducedMotion) {
+          cursorLight.intensity = 0;
+          cursorGlowMaterial.uniforms.uIntensity.value = 0;
+          crystalMaterial.uniforms.uCursorStrength.value = 0;
+        }
+
+        renderer.render(scene, camera);
+        if (heroIsVisible && tabIsVisible && !disposed) {
+          animationFrameId = requestAnimationFrame(renderFrame);
+        }
+      }
+
+      function disposeScene() {
+        if (disposed) return;
+        disposed = true;
+
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = 0;
+        }
+
+        if (observer) {
+          observer.disconnect();
+          observer = null;
+        }
+
+        window.removeEventListener("resize", resizeScene);
+        heroPanel.removeEventListener("pointermove", handlePointerMove);
+        heroPanel.removeEventListener("pointerleave", handlePointerLeave);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+
+        if (reducedMotionQuery.removeEventListener) {
+          reducedMotionQuery.removeEventListener("change", handleMotionPreferenceChange);
+        } else if (reducedMotionQuery.removeListener) {
+          reducedMotionQuery.removeListener(handleMotionPreferenceChange);
+        }
+
+        if (scene) {
+          scene.traverse((object) => {
+            if (object.geometry) object.geometry.dispose();
+            if (object.material) {
+              const materials = Array.isArray(object.material) ? object.material : [object.material];
+              materials.forEach((material) => material.dispose());
+            }
+          });
+        }
+
+        if (renderer) {
+          renderer.dispose();
+          renderer.forceContextLoss();
+          if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+        }
+      }
+
+      initScene();
+      window.addEventListener("beforeunload", disposeScene, { once: true });
+      window.addEventListener("pagehide", disposeScene, { once: true });
+    }
+  </script>
+</body>
+</html>
