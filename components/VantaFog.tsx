@@ -1,5 +1,7 @@
 'use client';
 
+import * as THREE from 'three';
+
 import { useEffect, useRef } from 'react';
 
 type VantaEffect = { destroy: () => void };
@@ -13,7 +15,7 @@ declare global {
   }
 }
 
-const THREE_SCRIPT = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js';
+
 const VANTA_SCRIPT = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js';
 
 function loadScript(src: string, key: string): Promise<void> {
@@ -53,9 +55,11 @@ export default function VantaFog() {
 
     async function initialize() {
       try {
-        await loadScript(THREE_SCRIPT, 'three-r134');
+        window.THREE = THREE;
+
         await loadScript(VANTA_SCRIPT, 'vanta-fog');
-        if (cancelled || !backgroundRef.current || !window.THREE || !window.VANTA?.FOG) return;
+
+        if (cancelled || !backgroundRef.current || !window.VANTA?.FOG) return;
 
         effect = window.VANTA.FOG({
           el: '#vanta-background',
