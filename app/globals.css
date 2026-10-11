@@ -402,13 +402,24 @@
         border-radius: 18px;
       }
 
-      .sakshi-3d-scene {
-        left: 0;
-        opacity: 0.6;
+      /* Stack the headline above the 3D scene on narrow screens. */
+      .hero-content {
+        justify-content: flex-start;
+        padding: clamp(60px, 13vh, 110px) 24px 0;
       }
 
       .hero-title {
+        font-size: clamp(42px, 10vw, 52px);
+        line-height: 1.08;
         letter-spacing: -2.5px;
+      }
+
+      .sakshi-3d-scene {
+        top: 42%;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        opacity: 0.72;
       }
 
       .forbidden-title {
